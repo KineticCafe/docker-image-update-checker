@@ -1,0 +1,14 @@
+name: Check DCO
+
+on:
+  pull_request:
+
+jobs:
+  check-dco:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: KineticCafe/actions-dco@v1.3
+        with:
+          exempt-authors: |
+            @kineticcommerce.com
+            @kineticcafe.com

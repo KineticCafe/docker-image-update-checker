@@ -21,10 +21,10 @@
 # OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
 # OTHER DEALINGS IN THE SOFTWARE.
 
-name: 'Docker Image Update Checker'
-description: |
-  GitHub Action to check if the base Docker image that your image is based on was updated
-  and your image needs to be updated. Note that this only checks the DockerHub registry.
+name: 'Docker Hub Image Update Checker'
+description: >
+  Checks the Docker Hub registry if a target image requires update because a base image
+  was updated.
 author: 'KineticCafe'
 inputs:
   base-image:
@@ -40,10 +40,6 @@ inputs:
       Comma-separted list of platforms to check. Defaults to `linux/amd64`.
     required: false
     default: 'linux/amd64'
-  # repo-token:
-  #   description: 'The GitHub token'
-  #   required: false
-  #   default: ${{ github.token }}
 
 outputs:
   needs-updating:
@@ -57,4 +53,4 @@ runs:
 
 branding:
   icon: anchor
-  color: blue
+  color: red

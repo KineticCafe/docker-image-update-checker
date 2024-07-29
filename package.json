@@ -1,0 +1,40 @@
+{
+  "name": "@kineticcafe/docker-image-update-checker",
+  "version": "1.0.0",
+  "author": "Kinetic Commerce",
+  "type": "module",
+  "description": "Check pull requests for DCO sign-off",
+  "main": "lib/main.js",
+  "scripts": {
+    "build": "tsc",
+    "check": "biome check .",
+    "check:fix": "biome check --write .",
+    "format": "biome format --write .",
+    "format:check": "biome format .",
+    "lint": "biome lint .",
+    "lint:fix": "biome lint --write .",
+    "package": "ncc build --source-map --license licenses.txt --minify",
+    "all": "pnpm run build && pnpm run check && pnpm run package"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/KineticCafe/docker-image-update-checker.git"
+  },
+  "keywords": ["github-actions", "docker", "docker-update"],
+  "bugs": {
+    "url": "https://github.com/KineticCafe/docker-image-update-checker/issues"
+  },
+  "homepage": "https://github.com/KineticCafe/docker-image-update-checker#readme",
+  "license": "Apache-2.0",
+  "dependencies": {
+    "@actions/core": "^1.10.1",
+    "ky": "^1.5.0"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "1.8.3",
+    "@types/node": "^20.14.9",
+    "@vercel/ncc": "^0.38.1",
+    "typescript": "5.5.4"
+  },
+  "packageManager": "pnpm@9.6.0+sha512.38dc6fba8dba35b39340b9700112c2fe1e12f10b17134715a4aa98ccf7bb035e76fd981cf0bb384dfa98f8d6af5481c2bef2f4266a24bfa20c34eb7147ce0b5e"
+}

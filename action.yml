@@ -1,0 +1,60 @@
+# Copyright 2024 Kinetic Commerce and contributors
+#
+# Derived from lucacome/docker-image-update-checker, copyright 2021 Luca Comellini
+#
+# MIT License
+#
+# Permission is hereby granted, free of charge, to any person obtaining a copy of this
+# software and associated documentation files (the "Software"), to deal in the Software
+# without restriction, including without limitation the rights to use, copy, modify,
+# merge, publish, distribute, sublicense, and/or sell copies of the Software, and to
+# permit persons to whom the Software is furnished to do so, subject to the following
+# conditions:
+#
+# The above copyright notice and this permission notice shall be included in all copies or
+# substantial portions of the Software.
+#
+# THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED,
+# INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR
+# PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE AUTHORS OR COPYRIGHT HOLDERS BE
+# LIABLE FOR ANY CLAIM, DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT
+# OR OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR
+# OTHER DEALINGS IN THE SOFTWARE.
+
+name: 'Docker Image Update Checker'
+description: |
+  GitHub Action to check if the base Docker image that your image is based on was updated
+  and your image needs to be updated. Note that this only checks the DockerHub registry.
+author: 'KineticCafe'
+inputs:
+  base-image:
+    description: |
+      The base image to use for comparison.
+    required: true
+  image:
+    description: |
+      Your image based on `base-image`.
+    required: true
+  platforms:
+    description: |
+      Comma-separted list of platforms to check. Defaults to `linux/amd64`.
+    required: false
+    default: 'linux/amd64'
+  # repo-token:
+  #   description: 'The GitHub token'
+  #   required: false
+  #   default: ${{ github.token }}
+
+outputs:
+  needs-updating:
+    description: |
+      Returns `true` if the needs to be updated.
+    value: ${{ steps.run-script.outputs.result }}
+
+runs:
+  using: 'node20'
+  main: 'dist/index.js'
+
+branding:
+  icon: anchor
+  color: blue

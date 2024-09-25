@@ -1,6 +1,6 @@
 {
   "name": "@kineticcafe/docker-image-update-checker",
-  "version": "1.1.0",
+  "version": "1.0.0",
   "author": "Kinetic Commerce",
   "type": "module",
   "description": "Check pull requests for DCO sign-off",

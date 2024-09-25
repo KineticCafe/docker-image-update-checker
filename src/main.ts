@@ -12,6 +12,17 @@ import pkg from '../package.json'
 
 const { name: NAME, version: VERSION } = pkg
 
+interface Registry {
+  authUrl: string
+  indexUrl: string
+  username: string | null
+  secret: string | null
+}
+
+interface AuthenticatedRegistry extends Registry {
+  token: string
+}
+
 interface Image {
   input: string
   repo: string
@@ -41,42 +52,93 @@ function parseImageName(input: string): Image {
   return { input, repo, tag: tag ?? 'latest' }
 }
 
-async function getImageAuthToken(image: Image): Promise<string> {
-  const res = await ky
-    .get('https://auth.docker.io/token', {
-      searchParams: {
-        service: 'registry.docker.io',
-        scope: `repository:${image.repo}:pull`,
-      },
-    })
-    .json()
-
-  if (res && typeof res === 'object' && 'token' in res && typeof res.token === 'string') {
-    return res.token
+function extractToken(response: unknown, error: Error): string {
+  if (
+    response &&
+    typeof response === 'object' &&
+    'token' in response &&
+    typeof response.token === 'string'
+  ) {
+    return response.token
   }
 
-  throw new Error(`Error obtaining pull authorization token for ${image.input}.`)
+  throw error
 }
 
-async function buildImageContext(input: string): Promise<Context> {
-  const image = parseImageName(input)
-  const token = await getImageAuthToken(image)
+async function authRegistry(
+  registry: Registry | AuthenticatedRegistry,
+): Promise<AuthenticatedRegistry | Registry> {
+  if ('token' in registry && registry.token) {
+    return registry
+  }
 
-  const res = await ky.get(`https://index.docker.io/v2/${image.repo}/tags/list`, {
-    headers: {
-      authorization: `Bearer ${token}`,
-    },
+  if (registry.username && registry.secret) {
+    const resp = await ky
+      .post('https://hub.docker.com/v2/users/login', {
+        json: {
+          username: registry.username,
+          password: registry.secret,
+        },
+      })
+      .json()
+
+    return {
+      ...registry,
+      token: extractToken(
+        resp,
+        new Error('Error obtaining registry authorization token.'),
+      ),
+    }
+  }
+
+  return registry
+}
+
+async function getImageAuthToken(
+  registry: Registry | AuthenticatedRegistry,
+  image: Image,
+): Promise<string> {
+  const headers =
+    'token' in registry && registry.token
+      ? { authorization: `Bearer ${registry.token}` }
+      : {}
+
+  const searchParams = {
+    service: 'registry.docker.io',
+    scope: `repository:${image.repo}:pull`,
+  }
+
+  const resp = await ky.get(registry.authUrl, { headers, searchParams }).json()
+
+  return extractToken(
+    resp,
+    new Error(`Error obtaining pull authorization token for ${image.input}.`),
+  )
+}
+
+async function buildImageContext(
+  registry: Registry | AuthenticatedRegistry,
+  input: string,
+): Promise<Context> {
+  const image = parseImageName(input)
+  const token =
+    'token' in registry && registry.token
+      ? registry.token
+      : await getImageAuthToken(registry, image)
+
+  const resp = await ky.get(`${registry.indexUrl}/${image.repo}/tags/list`, {
+    headers: { authorization: `Bearer ${token}` },
   })
 
-  if (res.status === 200) {
-    return { ...image, token: token }
+  if (resp.status === 200) {
+    return { ...image, token }
   }
 
   if (image.repo.startsWith('library/')) {
     throw new Error(`${image.input} does not exist on DockerHub as ${image.repo}`)
   }
 
-  return buildImageContext(`library/${input}`)
+  return buildImageContext(registry, `library/${input}`)
 }
 
 interface Manifest {
@@ -105,9 +167,12 @@ function resolveErrors(result: object): null | string {
   return null
 }
 
-async function getImageManifests(context: Context): Promise<Manifest[]> {
+async function getImageManifests(
+  registry: Registry | AuthenticatedRegistry,
+  context: Context,
+): Promise<Manifest[]> {
   const resp = await ky.get(
-    `https://index.docker.io/v2/${context.repo}/manifests/${context.tag}`,
+    `${registry.indexUrl}/${context.repo}/manifests/${context.tag}`,
     {
       headers: {
         authorization: `Bearer ${context.token}`,
@@ -161,9 +226,13 @@ async function getImageManifests(context: Context): Promise<Manifest[]> {
   throw new Error(`Invalid manifest response for ${context.input}: ${result}`)
 }
 
-async function getImageLayers(context: Context, digest: string): Promise<Set<string>> {
+async function getImageLayers(
+  registry: Registry | AuthenticatedRegistry,
+  context: Context,
+  digest: string,
+): Promise<Set<string>> {
   const result = await ky
-    .get(`https://index.docker.io/v2/${context.repo}/manifests/${digest}`, {
+    .get(`${registry.indexUrl}/${context.repo}/manifests/${digest}`, {
       headers: {
         authorization: `Bearer ${context.token}`,
         accept: [
@@ -191,18 +260,76 @@ async function getImageLayers(context: Context, digest: string): Promise<Set<str
   throw new Error(`Invalid layers response for ${context.input}: ${result}`)
 }
 
+function getRegistryAuthUrl(): string {
+  const authUrl = core.getInput('registry-auth-url')
+
+  if (authUrl === '') {
+    return 'https://auth.docker.io/token'
+  }
+
+  if (authUrl !== 'https://auth.docker.io/token') {
+    throw new Error(`Unsupported registry-auth-url: ${authUrl}`)
+  }
+
+  return authUrl
+}
+
+function getRegistryIndexUrl(): string {
+  const indexUrl = core.getInput('registry-index-url')
+
+  if (indexUrl === '') {
+    return 'https://index.docker.io/v2'
+  }
+
+  if (indexUrl !== 'https://index.docker.io/v2/') {
+    throw new Error(`Unsupported registry-index-url: ${indexUrl}`)
+  }
+
+  return indexUrl
+}
+
+function getRegistryUsername(): string | null {
+  const username = core.getInput('registry-username', { trimWhitespace: true })
+
+  return username === '' ? null : username
+}
+
+function getRegistrySecret(): string | null {
+  const secret = core.getInput('registry-secret', { trimWhitespace: true })
+
+  if (secret === '') {
+    return null
+  }
+
+  core.setSecret(secret)
+
+  return secret
+}
+
+async function getRegistryConfig(): Promise<Registry | AuthenticatedRegistry> {
+  const authUrl = getRegistryAuthUrl()
+  const indexUrl = getRegistryIndexUrl()
+  const username = getRegistryUsername()
+  const secret = getRegistrySecret()
+
+  const registry = { authUrl, indexUrl, secret, username }
+
+  return (await authRegistry(registry)) ?? registry
+}
+
 async function run(): Promise<void> {
   core.info(`${NAME} ${VERSION}`)
 
-  const target = core.getInput('image', { required: true })
-  const baseImage = core.getInput('base-image', { required: true })
+  const target = core.getInput('image', { required: true, trimWhitespace: true })
+  const baseImage = core.getInput('base-image', { required: true, trimWhitespace: true })
   const wantedPlatforms = core.getMultilineInput('platforms').flatMap((v) => v.split(','))
+  const registry = await getRegistryConfig()
 
-  const baseContext = await buildImageContext(baseImage)
-  const baseManifests = await getImageManifests(baseContext)
+  const baseContext = await buildImageContext(registry, baseImage)
+  const baseManifests = await getImageManifests(registry, baseContext)
 
-  const targetContext = await buildImageContext(target)
-  const targetManifests = await getImageManifests(targetContext)
+  const targetContext = await buildImageContext(registry, target)
+  const targetManifests = await getImageManifests(registry, targetContext)
 
   let diff = false
 
@@ -223,8 +350,8 @@ async function run(): Promise<void> {
       )
     }
 
-    const baseLayers = await getImageLayers(baseContext, baseDigest)
-    const targetLayers = await getImageLayers(targetContext, targetDigest)
+    const baseLayers = await getImageLayers(registry, baseContext, baseDigest)
+    const targetLayers = await getImageLayers(registry, targetContext, targetDigest)
 
     for (const v of targetLayers.values()) {
       if (!baseLayers.delete(v)) {

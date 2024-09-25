@@ -40,12 +40,31 @@ inputs:
       Comma-separted list of platforms to check. Defaults to `linux/amd64`.
     required: false
     default: 'linux/amd64'
+  registry-auth-url:
+    description: |
+      The URL to the registry auth service. Currently, only https://auth.docker.io/token
+      is supported.
+    required: false
+    default: 'https://auth.docker.io/token'
+  registry-index-url:
+    description: |
+      The URL to the registry index APIs. Currently, only https://index.docker.io/v2 is
+      supported.
+    required: false
+    default: 'https://index.docker.io/v2'
+  registry-username:
+    description: |
+      The registry username to use for authenticated API requests.
+    required: false
+  registry-secret:
+    description: |
+      The registry secret to use for authenticated API requests.
+    required: false
 
 outputs:
   needs-updating:
     description: |
       Returns `true` if the needs to be updated.
-    value: ${{ steps.run-script.outputs.result }}
 
 runs:
   using: 'node20'

@@ -40,10 +40,6 @@ inputs:
       Comma-separted list of platforms to check. Defaults to `linux/amd64`.
     required: false
     default: 'linux/amd64'
-  registry-token:
-    description: |
-      The DockerHub token to use for authenticated API requests.
-    required: false
 
 outputs:
   needs-updating:

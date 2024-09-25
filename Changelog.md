@@ -1,8 +1,8 @@
 # KineticCafe/docker-image-update-checker Changelog
 
-## 1.1 / 2024-09-25
+## NEXT / YYYY-MM-DD
 
-- Add the ability to pass the registry token as part of the request.
+- Update dependencies.
 
 ## 1.0 / 2024-07-29
 

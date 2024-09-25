@@ -58,9 +58,9 @@ async function getImageAuthToken(image: Image): Promise<string> {
   throw new Error(`Error obtaining pull authorization token for ${image.input}.`)
 }
 
-async function buildImageContext(input: string, registryToken: string): Promise<Context> {
+async function buildImageContext(input: string): Promise<Context> {
   const image = parseImageName(input)
-  const token = registryToken === '' ? await getImageAuthToken(image) : registryToken
+  const token = await getImageAuthToken(image)
 
   const res = await ky.get(`https://index.docker.io/v2/${image.repo}/tags/list`, {
     headers: {
@@ -76,7 +76,7 @@ async function buildImageContext(input: string, registryToken: string): Promise<
     throw new Error(`${image.input} does not exist on DockerHub as ${image.repo}`)
   }
 
-  return buildImageContext(`library/${input}`, token)
+  return buildImageContext(`library/${input}`)
 }
 
 interface Manifest {
@@ -194,15 +194,14 @@ async function getImageLayers(context: Context, digest: string): Promise<Set<str
 async function run(): Promise<void> {
   core.info(`${NAME} ${VERSION}`)
 
-  const target = core.getInput('image', { required: true, trimWhitespace: true })
-  const baseImage = core.getInput('base-image', { required: true, trimWhitespace: true })
+  const target = core.getInput('image', { required: true })
+  const baseImage = core.getInput('base-image', { required: true })
   const wantedPlatforms = core.getMultilineInput('platforms').flatMap((v) => v.split(','))
-  const registryToken = core.getInput('registry-token', { trimWhitespace: true })
 
-  const baseContext = await buildImageContext(baseImage, registryToken)
+  const baseContext = await buildImageContext(baseImage)
   const baseManifests = await getImageManifests(baseContext)
 
-  const targetContext = await buildImageContext(target, registryToken)
+  const targetContext = await buildImageContext(target)
   const targetManifests = await getImageManifests(targetContext)
 
   let diff = false

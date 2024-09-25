@@ -1,6 +1,6 @@
 {
   "name": "@kineticcafe/docker-image-update-checker",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "author": "Kinetic Commerce",
   "type": "module",
   "description": "Check pull requests for DCO sign-off",
@@ -28,13 +28,13 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@actions/core": "^1.10.1",
-    "ky": "^1.7.1"
+    "ky": "^1.7.2"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.8.3",
-    "@types/node": "^20.14.9",
-    "@vercel/ncc": "^0.38.1",
-    "typescript": "5.5.4"
+    "@biomejs/biome": "1.9.2",
+    "@types/node": "^20.16.7",
+    "@vercel/ncc": "^0.38.2",
+    "typescript": "5.6.2"
   },
-  "packageManager": "pnpm@9.9.0+sha512.60c18acd138bff695d339be6ad13f7e936eea6745660d4cc4a776d5247c540d0edee1a563695c183a66eb917ef88f2b4feb1fc25f32a7adcadc7aaf3438e99c1"
+  "packageManager": "pnpm@9.11.0+sha512.0a203ffaed5a3f63242cd064c8fb5892366c103e328079318f78062f24ea8c9d50bc6a47aa3567cabefd824d170e78fa2745ed1f16b132e16436146b7688f19b"
 }

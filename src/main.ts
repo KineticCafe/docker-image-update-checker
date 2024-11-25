@@ -8,7 +8,7 @@
 import * as core from '@actions/core'
 import ky from 'ky'
 
-import pkg from '../package.json'
+import pkg from '../package.json' with { type: 'json' }
 
 const { name: NAME, version: VERSION } = pkg
 

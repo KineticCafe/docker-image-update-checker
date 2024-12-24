@@ -1,6 +1,6 @@
 # KineticCafe/docker-image-update-checker Changelog
 
-## NEXT / YYYY-MM-DD
+## 1.0.1 / 2024-12-23
 
 - Update dependencies.
 

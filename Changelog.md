@@ -1,5 +1,9 @@
 # KineticCafe/docker-image-update-checker Changelog
 
+## 1.0.2 / 2024-01-24
+
+- Update dependencies.
+
 ## 1.0.1 / 2024-12-23
 
 - Update dependencies.

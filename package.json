@@ -28,7 +28,7 @@
   "license": "Apache-2.0",
   "dependencies": {
     "@actions/core": "^1.11.1",
-    "ky": "^1.7.4"
+    "ky": "^1.7.5"
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",

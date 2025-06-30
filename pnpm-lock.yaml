@@ -19,8 +19,8 @@ importers:
         specifier: 1.9.4
         version: 1.9.4
       '@types/node':
-        specifier: ^20.19.1
-        version: 20.19.1
+        specifier: ^20.19.2
+        version: 20.19.2
       '@vercel/ncc':
         specifier: ^0.38.3
         version: 0.38.3
@@ -99,8 +99,8 @@ packages:
     resolution: {integrity: sha512-vBZP4NlzfOlerQTnba4aqZoMhE/a9HY7HRqoOPaETQcSQuWEIyZMHGfVu6w9wGtGK5fED5qRs2DteVCjOH60sA==}
     engines: {node: '>=14'}
 
-  '@types/node@20.19.1':
-    resolution: {integrity: sha512-jJD50LtlD2dodAEO653i3YF04NWak6jN3ky+Ri3Em3mGR39/glWiboM/IePaRbgwSfqM1TpGXfAg8ohn/4dTgA==}
+  '@types/node@20.19.2':
+    resolution: {integrity: sha512-9pLGGwdzOUBDYi0GNjM97FIA+f92fqSke6joWeBjWXllfNxZBs7qeMF7tvtOIsbY45xkWkxrdwUfUf3MnQa9gA==}
 
   '@vercel/ncc@0.38.3':
     resolution: {integrity: sha512-rnK6hJBS6mwc+Bkab+PGPs9OiS0i/3kdTO+CkI8V0/VrW3vmz7O2Pxjw/owOlmo6PKEIxRSeZKv/kuL9itnpYA==}
@@ -181,7 +181,7 @@ snapshots:
 
   '@fastify/busboy@2.1.1': {}
 
-  '@types/node@20.19.1':
+  '@types/node@20.19.2':
     dependencies:
       undici-types: 6.21.0
 

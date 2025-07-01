@@ -5,6 +5,8 @@ on:
     branches: ["main"]
   pull_request:
 
+permissions: {}
+
 jobs:
   zizmor:
     name: zizmor latest via Cargo
@@ -25,7 +27,7 @@ jobs:
       - run: zizmor --persona pedantic --format sarif . > results.sarif
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - uses: github/codeql-action/upload-sarif@39edc492dbe16b1465b0cafca41432d857bdb31a # v3.29.1
+      - uses: github/codeql-action/upload-sarif@181d5eefc20863364f96762470ba6f862bdef56b # v3.29.2
         with:
           sarif_file: results.sarif
           category: zizmor

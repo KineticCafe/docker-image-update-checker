@@ -3,13 +3,19 @@ name: Check DCO
 on:
   pull_request:
 
+permissions: {}
+
 jobs:
   check-dco:
+    name: Check DCO Signature
     permissions:
       contents: read
     runs-on: ubuntu-latest
     steps:
-      - uses: KineticCafe/actions-dco@416cafbc9c07f26219d09981d9ac49ce29b5bfea #v1.3.4
+      - name: Harden Runner
+        uses: step-security/harden-runner@002fdce3c6a235733a90a27c80493a3241e56863 # v2.12.1
         with:
-          exempt-authors: |
-            austin@zieglers.ca
+          disable-sudo: true
+          egress-policy: audit
+
+      - uses: KineticCafe/actions-dco@416cafbc9c07f26219d09981d9ac49ce29b5bfea #v1.3.4

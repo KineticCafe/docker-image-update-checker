@@ -1,20 +1,26 @@
 # @KineticCafe/docker-image-update-checker
 
-This action checks using the DockerHub API if your `image`, which is based on
-a documented `base-image`, needs to be rebuilt to use the most recent version of
+> This action has been archived. It was originally based on an outdated version
+> of [lucacome/docker-image-update-checker][lcdiuc]. That action is now under
+> maintenance and should be used instead.
+
+[lcdiuc]: https://github.com/lucacome/docker-image-update-checker
+
+This action checks using the DockerHub API if your `image`, which is based on a
+documented `base-image`, needs to be rebuilt to use the most recent version of
 your `base-image`.
 
 ## Example Usage
 
-This example shows a check for `user/app:latest` against an updated `nginx`
-base image for the `linux/amd64` architecture.
+This example shows a check for `user/app:latest` against an updated `nginx` base
+image for the `linux/amd64` architecture.
 
 ```yaml
 name: Check docker image for update
 
 on:
   schedule:
-    - cron: '0 4 * * *'
+    - cron: "0 4 * * *"
 
 jobs:
   docker-update-check:
@@ -39,16 +45,16 @@ jobs:
 
 ### Multiple Platform Support
 
-This example shows a check for `user/app:latest` against an updated `nginx`
-base image for both `linux/amd64` and `linux/arm64`. The `needs-update` flag is
-set if any one of the platform abase images requires update.
+This example shows a check for `user/app:latest` against an updated `nginx` base
+image for both `linux/amd64` and `linux/arm64`. The `needs-update` flag is set
+if any one of the platform abase images requires update.
 
 ```yaml
 name: Check docker image for update (multiple platforms)
 
 on:
   schedule:
-    - cron: '0 4 * * *'
+    - cron: "0 4 * * *"
 
 jobs:
   check:
@@ -100,23 +106,23 @@ jobs:
 To debug this action, set the `DEBUG` environment variable in the workflow file.
 For convenience, `DEBUG` can be set from `${{ secrets.ACTIONS_STEP_DEBUG }}`,
 which works even when re-running the action with the `Re-run job` button and
-`Enable debug logging`. To read more about debugging actions, see [Debugging
-actions][action-debugging].
+`Enable debug logging`. To read more about debugging actions, see
+[Debugging actions][action-debugging].
 
 ## Contributing
 
-@KineticCafe/docker-image-update-checker [welcomes contributions][]. This project, like all
-Kinetic Commerce [open source projects][], is under the Kinetic Commerce Open
-Source [Code of Conduct][].
+@KineticCafe/docker-image-update-checker
+[welcomes contributions][welcomes contributions]. This project, like all Kinetic
+Commerce [open source projects][open source projects], is under the Kinetic
+Commerce Open Source [Code of Conduct][Code of Conduct].
 
-This project is licensed under the MIT license and requires certification via
-a Developer Certificate of Origin. See [Licence.md][] for more details.
+This project is licensed under the MIT license and requires certification via a
+Developer Certificate of Origin. See [Licence.md][Licence.md] for more details.
 
 ## Releasing
 
-Releases are prepared with `@vercel/ncc` to produce a single file which must
-be committed to `dist/`. Run `pnpm package` or `pnpm all` to produce this
-file.
+Releases are prepared with `@vercel/ncc` to produce a single file which must be
+committed to `dist/`. Run `pnpm package` or `pnpm all` to produce this file.
 
 [welcomes contributions]: https://github.com/KineticCafe/docker-image-update-checker/blob/main/Contributing.md
 [code of conduct]: https://github.com/KineticCafe/code-of-conduct
